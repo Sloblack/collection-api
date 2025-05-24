@@ -27,6 +27,9 @@ export class Contenedor {
   @Column({default: false})
   estadoRecoleccion: boolean;
 
+  @Column({default: 'Contenedor' })
+  lugar: string;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   ultima_actualizacion: Date;
 

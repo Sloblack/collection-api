@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Contenedor } from './entities/contenedor.entity';
 import { Repository } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { Ruta } from 'src/rutas/entities/ruta.entity';
 
 
 @Injectable()
@@ -12,6 +13,8 @@ export class ContenedoresService {
   constructor(
     @InjectRepository(Contenedor)
     private contenedoresRepository: Repository<Contenedor>,
+    @InjectRepository(Ruta)
+    private rutasRepository: Repository<Ruta>,
   ) {}
 
   async create(createContenedorDto: CreateContenedorDto): Promise<Contenedor> {
@@ -72,15 +75,30 @@ export class ContenedoresService {
     }
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   async actualizarEstadosRecoleccion() {
-    const contenedores = await this.contenedoresRepository.find();
-    for (const contenedor of contenedores) {
-      contenedor.estadoRecoleccion = false;
-      contenedor.ultima_actualizacion = new Date();
-      await this.contenedoresRepository.save(contenedor);
+    const now = new Date();
+    const currentTime = now.getTime();
+
+    const rutas = await this.rutasRepository.find({
+      relations: ['puntosRecoleccion', 'puntosRecoleccion.contenedor'],
+    });
+
+    for (const ruta of rutas) {
+      const [hours, minutes] = ruta.hora_actualizacion.split(':').map(Number);
+      const rutaUpdateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes).getTime();
+
+      if (currentTime >= rutaUpdateTime && currentTime < rutaUpdateTime + 5 * 60 * 1000) {
+        for (const punto of ruta.puntosRecoleccion) {
+          if (punto.contenedor) {
+            punto.contenedor.estadoRecoleccion = false;
+            punto.contenedor.ultima_actualizacion = now;
+            await this.contenedoresRepository.save(punto.contenedor);
+          }
+        }
+        console.log(`Estados de recolección actualizados para la ruta: ${ruta.nombre_ruta}`);
+      }
     }
-    console.log('Estados de recolección actualizados a medianoche');
   }
 
   async findContenedor(codigo: string): Promise<Contenedor> {

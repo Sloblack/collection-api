@@ -24,6 +24,9 @@ export class Ruta {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   fecha_creacion: Date;
 
+  @Column({ type: 'time', default: '00:00' })
+  hora_actualizacion: string;
+
   @OneToMany(
     () => PuntoRecoleccion,
     (puntoRecoleccion) => puntoRecoleccion.ruta,

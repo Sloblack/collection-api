@@ -7,10 +7,11 @@ import { ContenedoresModule } from './contenedores/contenedores.module';
 import { RutasModule } from './rutas/rutas.module';
 import { RecoleccionesModule } from './recolecciones/recolecciones.module';
 import { PuntosRecoleccionModule } from './puntos-recoleccion/puntos-recoleccion.module';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_PIPE, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { DateTransformInterceptor } from './interceptors/date-transform.interceptor';
 
 @Module({
   imports: [
@@ -26,9 +27,11 @@ import { ScheduleModule } from '@nestjs/schedule';
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_NAME'),
         entities: ['dist/**/*.entity{.ts,.js}'],
-        synchronize: true,
-        //logging: true,  // Muestra las consultas SQL en consola
-        //logger: "advanced-console",
+        synchronize: false,
+        extra: {
+          ssl:true,
+          options: `-c timezone=America/Mexico_City`
+        }
       })
     }),
     UsuariosModule,
@@ -44,12 +47,15 @@ import { ScheduleModule } from '@nestjs/schedule';
     AppService,
     {
       provide: APP_PIPE,
-      useClass: ValidationPipe,
       useValue: new ValidationPipe({
         whitelist: true,
         transform: true,
         forbidNonWhitelisted: true,
       }),
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: DateTransformInterceptor,
     },
   ],
 })

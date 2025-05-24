@@ -39,4 +39,9 @@ export class RutasController {
   remove(@Param('id') id: string) {
     return this.rutasService.remove(+id);
   }
+
+  @Patch(':id/cambiar_hora/:hora')
+  cambiarHoraActualizacion(@Param('id') id: string, @Param('hora') hora: string,) {
+    return this.rutasService.cambiarHoraActualizacion(+id, hora);
+  }
 }

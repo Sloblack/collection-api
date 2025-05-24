@@ -15,4 +15,9 @@ export class CreateContenedorDto {
   @ApiProperty()
   @IsString()
   codigo_NFC: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  lugar: string;
 }

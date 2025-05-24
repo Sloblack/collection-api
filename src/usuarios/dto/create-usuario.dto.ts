@@ -20,6 +20,6 @@ export class CreateUsuarioDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsEnum(['recolector', 'administrador'])
-  rol: 'recolector' | 'administrador';
+  @IsEnum(['recolector', 'administrador', 'invitado'])
+  rol: 'recolector' | 'administrador' | 'invitado';
 }

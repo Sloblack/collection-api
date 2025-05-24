@@ -46,4 +46,10 @@ export class RutasService {
       throw new NotFoundException(`Ruta con ID ${id} no encontrada`);
     }
   }
+
+  async cambiarHoraActualizacion(id: number, hora: string): Promise<Ruta> {
+    const ruta = await this.findOne(id);
+    ruta.hora_actualizacion = hora;
+    return this.rutasRepository.save(ruta);
+  }
 }

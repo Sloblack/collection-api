@@ -35,7 +35,7 @@ export class AuthService {
         nombre:string,
         contrasenia:string,
         telefono: string,
-        rol: 'recolector' | 'administrador'
+        rol: 'recolector' | 'administrador' | 'invitado'
     }) {
         const existingUser = await this.usuariosService.findByTelefono(userData.telefono);
         if (existingUser) {

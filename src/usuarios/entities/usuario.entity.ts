@@ -1,9 +1,9 @@
+
 import { Exclude } from 'class-transformer';
 import { Recoleccion } from 'src/recolecciones/entities/recoleccion.entity';
 import * as bcrypt from 'bcrypt';
 import {
   BeforeInsert,
-  BeforeUpdate,
   Column,
   Entity,
   JoinTable,
@@ -13,7 +13,6 @@ import {
 } from 'typeorm';
 import { ApiTags } from '@nestjs/swagger';
 import { Ruta } from 'src/rutas/entities/ruta.entity';
-import { truncate } from 'fs';
 
 @ApiTags('usuarios')
 @Entity('usuarios')
@@ -33,9 +32,9 @@ export class Usuario {
 
   @Column({
     type: 'enum',
-    enum: ['recolector', 'administrador'],
+    enum: ['recolector', 'administrador', 'invitado'],
   })
-  rol: 'recolector' | 'administrador';
+  rol: 'recolector' | 'administrador' | 'invitado';
 
   @OneToMany(() => Recoleccion, (recoleccion) => recoleccion.usuario)
   recolecciones: Recoleccion[];
@@ -54,25 +53,20 @@ export class Usuario {
   })
   rutas: Ruta[];
 
-  @Exclude()
-  private skipHashPassword: boolean = false;
-
   @BeforeInsert()
-  @BeforeUpdate()
-  async hashPassword() {
-    if (!this.skipHashPassword && this.contrasenia) {
+  async hashPasswordOnInsert() {
+    if (this.contrasenia) {
       const salt = await bcrypt.genSalt();
       this.contrasenia = await bcrypt.hash(this.contrasenia, salt);
     }
-    this.skipHashPassword = true;
   }
+
   async validatePassword(password: string): Promise<boolean> {
     return bcrypt.compare(password, this.contrasenia);
   }
+
   async changePassword(newPassword: string): Promise<void> {
     const salt = await bcrypt.genSalt();
     this.contrasenia = await bcrypt.hash(newPassword, salt);
-
-    this.skipHashPassword = true;
   }
 }

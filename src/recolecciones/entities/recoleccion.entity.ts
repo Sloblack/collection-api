@@ -16,7 +16,7 @@ export class Recoleccion {
   recoleccion_ID: number;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   fecha_recoleccion: Date;
