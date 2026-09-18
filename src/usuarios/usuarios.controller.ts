@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  ParseIntPipe,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
@@ -16,7 +6,12 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { Usuario } from './entities/usuario.entity';
 import { Ruta } from 'src/rutas/entities/ruta.entity';
 import { Recoleccion } from 'src/recolecciones/entities/recoleccion.entity';
+import { JwtAuthGuard } from "../guards/jwt-auth.guard";
+import { RolesGuard } from "../guards/roles.guard";
+import { Roles } from "../decorators/roles.decorator";
 
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('administrador')
 @Controller('usuarios')
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}

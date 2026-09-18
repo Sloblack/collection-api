@@ -16,6 +16,8 @@ export class AuthController {
     @ApiBody({ type: CreateUsuarioDto })
     @ApiResponse({ status: 201, description: 'Usuario creado exitosamente'})
     @ApiResponse({ status: 400, description: 'Datos inválidos'})
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('administrador')
     @Post('register')
     async register(@Body() createUsuarioDto: CreateUsuarioDto) {
         return this.authService.register(createUsuarioDto);

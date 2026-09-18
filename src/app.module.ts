@@ -27,9 +27,9 @@ import { DateTransformInterceptor } from './interceptors/date-transform.intercep
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_NAME'),
         entities: ['dist/**/*.entity{.ts,.js}'],
-        synchronize: false,
+        synchronize: true,
         extra: {
-          ssl:true,
+          ssl:false,
           options: `-c timezone=America/Mexico_City`
         }
       })
